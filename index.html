@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Sinyal Trading Lokal (Hapus Akun)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.success { background-color: #34D399; color: white; }
+        .toast.error { background-color: #F87171; color: white; }
+        .hidden-section { display: none; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #374151; }
+        ::-webkit-scrollbar-thumb { background: #6b7280; border-radius: 3px;}
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center p-4 pt-8 sm:pt-12">
+
+    <!-- Login Section -->
+    <div id="loginSection" class="w-full max-w-sm bg-gray-800 shadow-2xl rounded-xl p-6 sm:p-8">
+        <h1 class="text-2xl font-bold text-sky-400 text-center mb-6">Login Aplikasi Sinyal</h1>
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-300 mb-1">Nama Pengguna</label>
+                <input type="text" id="username" name="username" required
+                       class="w-full bg-gray-700 border border-gray-600 text-gray-100 rounded-lg p-2.5 focus:ring-sky-500 focus:border-sky-500 placeholder-gray-500">
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                <input type="password" id="password" name="password" required
+                       class="w-full bg-gray-700 border border-gray-600 text-gray-100 rounded-lg p-2.5 focus:ring-sky-500 focus:border-sky-500 placeholder-gray-500">
+            </div>
+            <button type="submit"
+                    class="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2.5 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 transition duration-150 ease-in-out">
+                Login
+            </button>
+        </form>
+    </div>
+
+    <!-- Admin Section -->
+    <div id="adminSection" class="hidden-section w-full max-w-2xl mt-8">
+        <header class="mb-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl sm:text-3xl font-bold text-sky-400">Admin Panel</h1>
+                <button id="adminLogoutButton" class="text-sm bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md">Logout</button>
+            </div>
+            <p class="text-sm text-gray-400 mt-1">Selamat datang, <span id="adminNameDisplay" class="font-semibold">Admin</span>!</p>
+        </header>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Kolom Kirim Sinyal -->
+            <div class="bg-gray-800 shadow-xl rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-sky-300 mb-4">Kirim Sinyal Baru</h2>
+                <form id="signalFormAdmin" class="space-y-4">
+                    <div>
+                        <label for="assetAdmin" class="block text-sm font-medium text-gray-300 mb-1">Aset</label>
+                        <input type="text" id="assetAdmin" required class="w-full bg-gray-700 border-gray-600 rounded-lg p-2.5" placeholder="Contoh: BTC/USD">
+                    </div>
+                    <div>
+                        <label for="actionAdmin" class="block text-sm font-medium text-gray-300 mb-1">Aksi</label>
+                        <select id="actionAdmin" required class="w-full bg-gray-700 border-gray-600 rounded-lg p-2.5">
+                            <option value="BUY">BUY</option>
+                            <option value="SELL">SELL</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="notesAdmin" class="block text-sm font-medium text-gray-300 mb-1">Catatan</label>
+                        <textarea id="notesAdmin" rows="3" class="w-full bg-gray-700 border-gray-600 rounded-lg p-2.5" placeholder="Catatan tambahan..."></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg">Kirim Sinyal</button>
+                </form>
+                <div class="mt-6">
+                    <h3 class="text-md font-semibold text-gray-300 mb-2">Sinyal Terkirim Terakhir</h3>
+                    <div id="sentSignalsListAdmin" class="space-y-2 max-h-40 overflow-y-auto pr-1 text-xs">
+                        <p class="text-gray-500">Belum ada sinyal.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kolom Buat User Baru -->
+            <div class="bg-gray-800 shadow-xl rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-sky-300 mb-4">Buat & Kelola User</h2>
+                <div class="bg-yellow-500/10 border border-yellow-600 text-yellow-300 px-3 py-2 rounded-md text-xs mb-4">
+                    <strong>Perhatian:</strong> Password disimpan di memori browser dan tidak dienkripsi. Data hilang saat refresh.
+                </div>
+                <form id="createUserForm" class="space-y-4 mb-6">
+                    <div>
+                        <label for="newUsername" class="block text-sm font-medium text-gray-300 mb-1">Nama Pengguna Baru</label>
+                        <input type="text" id="newUsername" required class="w-full bg-gray-700 border-gray-600 rounded-lg p-2.5">
+                    </div>
+                    <div>
+                        <label for="newPassword" class="block text-sm font-medium text-gray-300 mb-1">Password Baru</label>
+                        <input type="text" id="newPassword" required class="w-full bg-gray-700 border-gray-600 rounded-lg p-2.5">
+                    </div>
+                    <div>
+                        <label for="expiryDateTime" class="block text-sm font-medium text-gray-300 mb-1">Waktu Berlaku</label>
+                        <input type="datetime-local" id="expiryDateTime" required class="w-full bg-gray-700 border-gray-600 rounded-lg p-2.5 text-gray-400">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg">Buat User</button>
+                </form>
+                <div>
+                    <h3 class="text-md font-semibold text-gray-300 mb-2">User Dibuat</h3>
+                    <div id="createdUsersListAdmin" class="space-y-2 max-h-40 overflow-y-auto pr-1 text-xs">
+                        <p class="text-gray-500">Belum ada user dibuat.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Section -->
+    <div id="userSection" class="hidden-section w-full max-w-xl mt-8">
+         <header class="mb-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl sm:text-3xl font-bold text-sky-400">Lihat Sinyal</h1>
+                <button id="userLogoutButton" class="text-sm bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md">Logout</button>
+            </div>
+            <p class="text-sm text-gray-400 mt-1">Selamat datang, <span id="userNameDisplay" class="font-semibold">User</span>!</p>
+        </header>
+        <main id="signalsContainerUser" class="space-y-4">
+            <p id="loadingMessageUser" class="text-gray-500 text-center py-10">Belum ada sinyal.</p>
+        </main>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script>
+        // --- Data Lokal (Client-Side) ---
+        let signalsArray = [];
+        let userCredentialsArray = [
+            { username: 'Ilham', password: '592007', role: 'admin', expiry: null, createdAt: new Date(0) },
+            { username: 'user', password: 'user', role: 'user', expiry: null, createdAt: new Date(0) }
+        ];
+        let currentUser = null;
+
+        // --- DOM Elements ---
+        const loginSection = document.getElementById('loginSection');
+        const adminSection = document.getElementById('adminSection');
+        const userSection = document.getElementById('userSection');
+        const loginForm = document.getElementById('loginForm');
+        
+        const adminNameDisplay = document.getElementById('adminNameDisplay');
+        const signalFormAdmin = document.getElementById('signalFormAdmin');
+        const sentSignalsListAdmin = document.getElementById('sentSignalsListAdmin');
+        const createUserForm = document.getElementById('createUserForm');
+        const createdUsersListAdmin = document.getElementById('createdUsersListAdmin');
+        const adminLogoutButton = document.getElementById('adminLogoutButton');
+
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const signalsContainerUser = document.getElementById('signalsContainerUser');
+
+        // --- Fungsi Tampilan & UI ---
+        function showSection(sectionId) {
+            loginSection.style.display = 'none';
+            adminSection.style.display = 'none';
+            userSection.style.display = 'none';
+            if (document.getElementById(sectionId)) {
+                document.getElementById(sectionId).style.display = 'block';
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            toastContainer.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.parentNode?.removeChild(toast), 300);
+            }, 3000);
+        }
+        
+        function logout() {
+            currentUser = null;
+            showSection('loginSection');
+        }
+
+        adminLogoutButton.addEventListener('click', logout);
+        userLogoutButton.addEventListener('click', logout);
+
+        // --- Login Aplikasi (Client-Side) ---
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const usernameInput = loginForm.username.value;
+            const passwordInput = loginForm.password.value;
+
+            const foundUser = userCredentialsArray.find(cred => cred.username === usernameInput && cred.password === passwordInput);
+
+            if (foundUser) {
+                if (foundUser.expiry && foundUser.expiry < new Date()) {
+                    showToast(`Akun ${foundUser.username} sudah kedaluwarsa.`, 'error');
+                    loginForm.reset();
+                    return;
+                }
+                currentUser = { username: foundUser.username, role: foundUser.role };
+                if (foundUser.role === 'admin') {
+                    adminNameDisplay.textContent = currentUser.username;
+                    showSection('adminSection');
+                    renderAdminSentSignals();
+                    renderAdminCreatedUsers();
+                } else {
+                    userNameDisplay.textContent = currentUser.username;
+                    showSection('userSection');
+                    renderUserSignals();
+                }
+            } else {
+                showToast('Nama pengguna atau password salah.', 'error');
+            }
+            loginForm.reset();
+        });
+
+        // --- Fungsi Admin ---
+        signalFormAdmin.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!currentUser || currentUser.role !== 'admin') return;
+
+            const asset = signalFormAdmin.assetAdmin.value.trim().toUpperCase();
+            const action = signalFormAdmin.actionAdmin.value;
+            const notes = signalFormAdmin.notesAdmin.value.trim();
+
+            if (!asset) {
+                showToast('Aset wajib diisi.', 'error');
+                return;
+            }
+
+            const newSignal = {
+                id: Date.now().toString(), 
+                asset, action, notes,
+                timestamp: new Date(),
+                createdBy: currentUser.username
+            };
+            signalsArray.unshift(newSignal); 
+
+            showToast('Sinyal berhasil dikirim!', 'success');
+            signalFormAdmin.reset();
+            renderAdminSentSignals();
+            if (document.getElementById('userSection').style.display === 'block') {
+                 renderUserSignals(); 
+            }
+        });
+
+        function renderAdminSentSignals() {
+            sentSignalsListAdmin.innerHTML = '';
+            const recentSignals = signalsArray.slice(0, 5); 
+
+            if (recentSignals.length === 0) {
+                sentSignalsListAdmin.innerHTML = '<p class="text-gray-500">Belum ada sinyal.</p>';
+                return;
+            }
+            recentSignals.forEach(s => {
+                const el = document.createElement('div');
+                el.className = `p-2 rounded-md ${s.action === 'BUY' ? 'bg-green-800/60' : 'bg-red-800/60'} flex justify-between items-start`;
+                
+                const signalInfo = document.createElement('div');
+                signalInfo.innerHTML = `<strong>${s.action} ${s.asset}</strong> <span class="text-gray-400 text-xs">(${s.timestamp.toLocaleTimeString('id-ID')})</span><p class="text-gray-300 italic text-xs">${s.notes || '-tanpa catatan-'}</p>`;
+                
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Hapus';
+                deleteButton.className = 'text-xs bg-red-700 hover:bg-red-600 px-2 py-1 rounded ml-2 flex-shrink-0'; // Tambah flex-shrink-0
+                deleteButton.onclick = function() { deleteSignal(s.id); };
+                
+                el.appendChild(signalInfo);
+                el.appendChild(deleteButton);
+                sentSignalsListAdmin.appendChild(el);
+            });
+        }
+
+        function deleteSignal(signalId) {
+            signalsArray = signalsArray.filter(signal => signal.id !== signalId);
+            showToast('Sinyal berhasil dihapus.', 'success');
+            renderAdminSentSignals();
+            if (document.getElementById('userSection').style.display === 'block') {
+                 renderUserSignals(); 
+            }
+        }
+
+        createUserForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!currentUser || currentUser.role !== 'admin') return;
+
+            const newUsername = createUserForm.newUsername.value.trim();
+            const newPassword = createUserForm.newPassword.value;
+            const expiryDateTimeValue = createUserForm.expiryDateTime.value;
+
+            if (!newUsername || !newPassword || !expiryDateTimeValue) {
+                showToast('Semua field pembuatan user wajib diisi.', 'error');
+                return;
+            }
+
+            if (userCredentialsArray.find(u => u.username === newUsername)) {
+                showToast(`Nama pengguna "${newUsername}" sudah digunakan.`, 'error');
+                return;
+            }
+
+            const expiryDate = new Date(expiryDateTimeValue);
+            if (isNaN(expiryDate.getTime())) {
+                showToast('Format waktu berlaku tidak valid.', 'error');
+                return;
+            }
+
+            userCredentialsArray.push({
+                username: newUsername,
+                password: newPassword, 
+                role: 'user',
+                expiry: expiryDate,
+                createdAt: new Date()
+            });
+
+            showToast(`User ${newUsername} berhasil dibuat!`, 'success');
+            createUserForm.reset();
+            renderAdminCreatedUsers();
+        });
+        
+        function renderAdminCreatedUsers() {
+            createdUsersListAdmin.innerHTML = '';
+            const createdOnly = userCredentialsArray
+                .filter(u => u.username !== 'Ilham' && u.username !== 'user') // Filter default users
+                .sort((a,b) => b.createdAt - a.createdAt) // Urutkan berdasarkan waktu pembuatan
+                .slice(0,5); // Ambil 5 terakhir
+
+            if (createdOnly.length === 0) {
+                createdUsersListAdmin.innerHTML = '<p class="text-gray-500">Belum ada user dibuat.</p>';
+                return;
+            }
+            createdOnly.forEach(u => {
+                const userItem = document.createElement('div');
+                userItem.className = 'p-2 rounded-md bg-gray-700/50 flex justify-between items-start';
+
+                const userInfo = document.createElement('div');
+                const expiryString = u.expiry ? u.expiry.toLocaleString('id-ID') : 'Tidak ada';
+                const isExpired = u.expiry && u.expiry < new Date();
+                userInfo.innerHTML = `<strong>${u.username}</strong> <span class="text-xs ${isExpired ? 'text-red-400' : 'text-gray-400'}">(Berlaku s/d: ${expiryString} ${isExpired ? '- KEDALUWARSA' : ''})</span> <p class="text-gray-400 text-xs">Pass: ${u.password} (Lokal)</p>`;
+                
+                const deleteUserButton = document.createElement('button');
+                deleteUserButton.textContent = 'Hapus';
+                deleteUserButton.className = 'text-xs bg-red-700 hover:bg-red-600 px-2 py-1 rounded ml-2 flex-shrink-0';
+                deleteUserButton.onclick = function() { deleteUserAccount(u.username); };
+
+                userItem.appendChild(userInfo);
+                userItem.appendChild(deleteUserButton);
+                createdUsersListAdmin.appendChild(userItem);
+            });
+        }
+
+        function deleteUserAccount(usernameToDelete) {
+            // Tambahkan konfirmasi sederhana
+            // if (!confirm(`Apakah Anda yakin ingin menghapus akun "${usernameToDelete}"?`)) {
+            //     return;
+            // }
+            userCredentialsArray = userCredentialsArray.filter(user => user.username !== usernameToDelete);
+            showToast(`Akun "${usernameToDelete}" berhasil dihapus.`, 'success');
+            renderAdminCreatedUsers(); // Update tampilan daftar user
+        }
+
+
+        // --- Fungsi User ---
+        function renderUserSignals() {
+            signalsContainerUser.innerHTML = ''; 
+            if (signalsArray.length === 0) {
+                signalsContainerUser.innerHTML = '<p id="loadingMessageUser" class="text-gray-500 text-center py-10">Belum ada sinyal tersedia.</p>';
+                return;
+            }
+            signalsArray.forEach(s => { 
+                const card = document.createElement('div');
+                card.className = 'signal-card bg-gray-800 p-4 rounded-lg shadow-md border border-gray-700'; 
+                
+                const actionClass = s.action === 'BUY' ? 'text-green-400' : 'text-red-400';
+                const time = s.timestamp.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+                const date = s.timestamp.toLocaleDateString('id-ID', {day:'numeric', month:'short'});
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-lg font-semibold ${actionClass}">${s.action} ${s.asset}</h3>
+                        <span class="text-xs text-gray-400">${date}, ${time}</span>
+                    </div>
+                    <p class="text-sm text-gray-300 break-words">${s.notes || '<span class="italic text-gray-500">- Tanpa catatan -</span>'}</p>
+                `;
+                signalsContainerUser.appendChild(card);
+            });
+        }
+
+        // Inisialisasi: Tampilkan halaman login
+        showSection('loginSection');
+        console.log("Aplikasi Sinyal Lokal - Inisialisasi UI selesai. Menunggu login.");
+
+    </script>
+</body>
+</html>
