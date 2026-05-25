@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Create Email - Premium Simulator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#090A0F',
+                        glassBg: 'rgba(15, 23, 42, 0.45)',
+                        neonBlue: '#00F0FF',
+                        neonPurple: '#AD00FF',
+                    },
+                    boxShadow: {
+                        neonB: '0 0 15px rgba(0, 240, 255, 0.4)',
+                        neonP: '0 0 15px rgba(173, 0, 255, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top right, #110e2e, #040508);
+            overflow-x: hidden;
+        }
+        .font-mono-tech {
+            font-family: 'Share Tech Mono', monospace;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(173, 0, 255, 0.3);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 240, 255, 0.5);
+        }
+        /* Glassmorphism Blur */
+        .glass-panel {
+            background: rgba(13, 17, 28, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: #00F0FF;
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-100 flex items-center justify-center p-2 sm:p-4">
+
+    <!-- Ambient Glow effects -->
+    <div class="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-neonPurple/15 blur-[120px] pointer-events-none"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-neonBlue/15 blur-[120px] pointer-events-none"></div>
+
+    <!-- MAIN DEVICE SIMULATOR FRAME -->
+    <div class="w-full max-w-md bg-[#0D0F16] rounded-[48px] border-[6px] border-slate-800 shadow-2xl relative overflow-hidden flex flex-col aspect-[9/19.5] max-h-[880px] min-h-[720px]">
+        
+        <!-- Status Bar Android Simulator -->
+        <div class="h-10 px-6 pt-2 flex justify-between items-center bg-[#07080d] z-50 text-xs text-slate-400 select-none font-medium">
+            <span id="statusBarTime">20:00</span>
+            <!-- Camera Punch hole -->
+            <div class="w-4 h-4 rounded-full bg-black border border-slate-800 flex items-center justify-center">
+                <div class="w-1.5 h-1.5 rounded-full bg-blue-900/50"></div>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.13 19.53 10.53 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                <span class="text-[10px]">98%</span>
+            </div>
+        </div>
+
+        <!-- APP SCREENS CONTAINER -->
+        <div class="flex-1 relative flex flex-col overflow-y-auto">
+
+            <!-- 1. SPLASH SCREEN (Overlay) -->
+            <div id="splashScreen" class="absolute inset-0 bg-[#07090E] z-50 flex flex-col items-center justify-between py-12 transition-all duration-1000 ease-in-out">
+                <div></div>
+                
+                <!-- Center Logo & Branding -->
+                <div class="flex flex-col items-center text-center px-6">
+                    <!-- Futuristic App Icon -->
+                    <div class="relative w-28 h-28 mb-6 flex items-center justify-center">
+                        <!-- Neon Outer Rings -->
+                        <div class="absolute inset-0 rounded-3xl border-2 border-neonBlue animate-spin [animation-duration:8s] opacity-80 shadow-neonB"></div>
+                        <div class="absolute inset-2 rounded-3xl border border-dashed border-neonPurple animate-spin [animation-duration:12s] [animation-direction:reverse] opacity-70"></div>
+                        <div class="absolute inset-4 rounded-2xl bg-gradient-to-br from-indigo-950 to-slate-900 border border-white/10 flex items-center justify-center">
+                            <!-- Inner Icon: Futuristic Mail Shield -->
+                            <svg class="w-12 h-12 text-neonBlue filter drop-shadow-[0_0_8px_rgba(0,240,255,0.6)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <h1 class="text-3xl font-extrabold tracking-wider bg-gradient-to-r from-neonBlue via-indigo-200 to-neonPurple bg-clip-text text-transparent">
+                        AUTO EMAIL
+                    </h1>
+                    <p class="text-xs tracking-[0.3em] uppercase text-indigo-400 mt-2 font-mono-tech">Generator Enkripsi v2.5</p>
+                </div>
+
+                <!-- Footer & Progress Bar -->
+                <div class="w-full px-12 flex flex-col items-center">
+                    <div class="w-full h-[3px] bg-slate-900 rounded-full overflow-hidden mb-3 relative">
+                        <div id="splashProgress" class="h-full bg-gradient-to-r from-neonBlue to-neonPurple w-0 transition-all duration-[2000ms] ease-out"></div>
+                    </div>
+                    <span class="text-[10px] text-slate-500 font-mono-tech tracking-widest uppercase">Memuat Protokol Keamanan...</span>
+                </div>
+            </div>
+
+
+            <!-- 2. MAIN APPLICATION CONTENT -->
+            <div class="flex-1 flex flex-col px-5 py-4 pb-16">
+                
+                <!-- App Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-950 to-slate-900 border border-white/10 flex items-center justify-center shadow-neonB">
+                            <svg class="w-5 h-5 text-neonBlue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="font-bold text-base text-white tracking-wide">Auto Create Email</h2>
+                            <span class="text-[10px] text-neonBlue font-mono-tech uppercase tracking-widest">Sistem Aktif</span>
+                        </div>
+                    </div>
+
+                    <!-- WhatsApp Admin Button Float (Glassmorphism Circle) -->
+                    <a href="https://wa.me/+62895352251177" target="_blank" onclick="playClickSound()" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center border border-emerald-500/30 hover:border-emerald-400/80 hover:shadow-[0_0_12px_rgba(16,185,129,0.3)] transition-all duration-300 relative group" title="WhatsApp Admin">
+                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full animate-ping"></span>
+                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full"></span>
+                        <svg class="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform duration-300" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- WA Channel banner ad-style -->
+                <div class="mb-5 p-3 rounded-2xl bg-gradient-to-r from-violet-950/60 to-indigo-950/60 border border-indigo-500/20 flex items-center justify-between shadow-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+                            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-white tracking-wide">Dapatkan Update Terbaru</h4>
+                            <p class="text-[10px] text-slate-400">Ikuti Saluran WhatsApp Resmi</p>
+                        </div>
+                    </div>
+                    <a href="https://whatsapp.com/channel/0029Vb7bsy56hENhrsd0vp1L" target="_blank" onclick="playClickSound()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold tracking-wide transition-all shadow-[0_0_10px_rgba(79,70,229,0.4)]">
+                        SALURAN WA
+                    </a>
+                </div>
+
+                <!-- MAIN FORM PANEL -->
+                <div class="glass-panel rounded-3xl p-5 mb-5 relative">
+                    <h3 class="text-xs font-mono-tech text-neonBlue uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-neonBlue animate-ping"></span>
+                        PARAMETER EMAIL BARU
+                    </h3>
+
+                    <!-- Username Field -->
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-xs text-slate-300 font-medium">Username / Nama Email</label>
+                            <button onclick="generateRandomUsername()" class="text-[10px] text-neonBlue hover:text-white transition-colors flex items-center gap-1 font-mono-tech">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17"/></svg>
+                                RANDOM
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <input type="text" id="inputUsername" placeholder="Contoh: cyber.warrior" class="w-full glass-input rounded-xl py-3 pl-4 pr-32 text-sm text-white focus:outline-none placeholder-slate-500">
+                            <!-- Extension drop label -->
+                            <div class="absolute right-2.5 top-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900/80 border border-white/5 text-[11px] font-mono-tech text-slate-400 select-none">
+                                @gmail.com
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="mb-5">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-xs text-slate-300 font-medium">Kata Sandi (Password)</label>
+                            <button onclick="generateRandomPassword()" class="text-[10px] text-neonPurple hover:text-white transition-colors flex items-center gap-1 font-mono-tech">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                SECURE GENERATE
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <input type="text" id="inputPassword" placeholder="Masukkan password unik Anda" class="w-full glass-input rounded-xl py-3 px-4 text-sm text-white focus:outline-none placeholder-slate-500">
+                        </div>
+                    </div>
+
+                    <!-- CREATE EMAIL BUTTON (NEON GLOW ACTION) -->
+                    <button onclick="triggerEmailCreation()" class="w-full py-4 rounded-xl bg-gradient-to-r from-neonBlue to-neonPurple hover:brightness-110 active:scale-[0.98] font-bold text-sm tracking-widest text-white shadow-neonB transition-all duration-300 flex items-center justify-center gap-2 relative overflow-hidden group">
+                        <!-- Shining sweep overlay -->
+                        <div class="absolute inset-0 w-1/2 h-full bg-white/20 skew-x-[-30deg] -translate-x-full group-hover:translate-x-[300%] transition-transform duration-1000 ease-in-out"></div>
+                        <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        <span>CREATE EMAIL NOW</span>
+                    </button>
+                </div>
+
+
+                <!-- 3. PROCESS LOADING SCREEN (TERMINAL GLOW STYLE) -->
+                <div id="processingConsole" class="hidden glass-panel rounded-3xl p-5 mb-5 border-cyan-500/30 shadow-neonB relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-[2px] bg-neonBlue animate-pulse"></div>
+                    <div class="flex items-center justify-between mb-3.5">
+                        <span class="text-xs font-mono-tech text-neonBlue tracking-widest">ENCRYPTING INBOX PROTOCOL...</span>
+                        <!-- Custom Spin Ring -->
+                        <div class="w-4 h-4 border-2 border-slate-700 border-t-neonBlue rounded-full animate-spin"></div>
+                    </div>
+                    <!-- Mock terminal lines -->
+                    <div class="bg-black/60 rounded-xl p-3 text-[10px] font-mono-tech text-cyan-400 space-y-1 h-32 overflow-y-auto" id="terminalLogs">
+                        <div>> Mempersiapkan database...</div>
+                    </div>
+                </div>
+
+
+                <!-- 4. MODERN SUCCESS RESULT CARD (HIDDEN BY DEFAULT) -->
+                <div id="successCard" class="hidden glass-panel rounded-3xl p-5 mb-5 border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)] relative transition-all duration-500 scale-95 opacity-0">
+                    <!-- Particle / Confetti Canvas -->
+                    <canvas id="confettiCanvas" class="absolute inset-0 w-full h-full pointer-events-none rounded-3xl"></canvas>
+                    
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-2 mb-3.5">
+                            <span class="p-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            </span>
+                            <h4 class="text-xs font-bold text-emerald-400 tracking-widest uppercase font-mono-tech">EMAIL AKTIF & AMAN</h4>
+                        </div>
+
+                        <!-- Card Display -->
+                        <div class="bg-slate-950/80 rounded-2xl p-4 border border-white/5 space-y-3 relative overflow-hidden">
+                            <!-- Security scan glow overlay -->
+                            <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-40 animate-pulse"></div>
+                            
+                            <div>
+                                <span class="text-[9px] uppercase tracking-wider text-slate-500 block mb-0.5">ALAMAT EMAIL</span>
+                                <div class="text-sm font-semibold text-white tracking-wide" id="displayEmail">cyber.shogun@gmail.com</div>
+                            </div>
+                            <div class="border-t border-white/5 pt-2">
+                                <span class="text-[9px] uppercase tracking-wider text-slate-500 block mb-0.5">KATA SANDI (PASSWORD)</span>
+                                <div class="text-sm font-mono-tech text-neonBlue tracking-wider" id="displayPassword">********</div>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Buttons -->
+                        <div class="grid grid-cols-2 gap-3 mt-4">
+                            <!-- Toggle View Password -->
+                            <button onclick="togglePasswordVisibility()" class="py-2.5 rounded-xl border border-white/10 hover:border-white/20 text-slate-300 hover:text-white text-xs font-medium transition-colors flex items-center justify-center gap-1.5 bg-white/5">
+                                <svg class="w-4 h-4" id="eyeIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <span id="eyeText">Intip Sandi</span>
+                            </button>
+                            <!-- Copy Button -->
+                            <button onclick="copyGeneratedEmail()" class="py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:brightness-110 text-white text-xs font-bold tracking-wider transition-all shadow-[0_0_12px_rgba(16,185,129,0.3)] flex items-center justify-center gap-1.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                COPY EMAIL
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 5. RECENT HISTORY LIST -->
+                <div class="mt-2 flex-1 flex flex-col min-h-[180px]">
+                    <div class="flex items-center justify-between mb-3 px-1">
+                        <span class="text-xs font-bold text-slate-400 tracking-wider flex items-center gap-1.5 uppercase">
+                            <svg class="w-4 h-4 text-neonPurple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Riwayat Enkripsi
+                        </span>
+                        <button onclick="clearHistory()" class="text-[10px] text-rose-400 hover:text-rose-300 font-mono-tech transition-colors">
+                            HAPUS SEMUA
+                        </button>
+                    </div>
+
+                    <div id="historyPlaceholder" class="flex-1 flex flex-col items-center justify-center text-center p-6 border border-dashed border-white/5 rounded-2xl bg-white/[0.01]">
+                        <svg class="w-8 h-8 text-slate-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0V9a2 2 0 00-2-2H6a2 2 0 00-2 2v4.5m12-3l-3-3m0 0l-3 3m3-3V15"/>
+                        </svg>
+                        <p class="text-xs text-slate-500">Belum ada email yang digenerate.</p>
+                    </div>
+
+                    <!-- Scrollable History Container -->
+                    <div id="historyList" class="space-y-2 max-h-[220px] overflow-y-auto hidden pr-1">
+                        <!-- Dynamic items loaded via JavaScript -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TOAST BANNER CONTAINER (Bottom Float) -->
+            <div id="toastNotification" class="absolute bottom-16 left-4 right-4 bg-slate-900/95 border border-neonBlue/40 rounded-xl px-4 py-3 text-xs text-slate-200 shadow-xl flex items-center gap-2 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none z-50">
+                <span class="w-2 h-2 rounded-full bg-neonBlue animate-pulse"></span>
+                <span id="toastMessage" class="flex-1">Pemberitahuan Sistem</span>
+            </div>
+
+            <!-- SIMULATED SYSTEM HOME BAR -->
+            <div class="absolute bottom-1.5 inset-x-0 flex justify-center z-50 pointer-events-none">
+                <div class="w-32 h-1 bg-white/20 rounded-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIO SYNTHESIS ENGINE (FOLEY EFFECT) -->
+    <script>
+        // Synthesizing Retro Sound Effects using the Web Audio API (No outside MP3 files required!)
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playClickSound() {
+            initAudio();
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function playSuccessSound() {
+            initAudio();
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            
+            // Arpeggio sound
+            const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((freq, index) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, now + (index * 0.08));
+                gain.gain.setValueAtTime(0.05, now + (index * 0.08));
+                gain.gain.exponentialRampToValueAtTime(0.001, now + (index * 0.08) + 0.25);
+                osc.start(now + (index * 0.08));
+                osc.stop(now + (index * 0.08) + 0.25);
+            });
+        }
+
+        function playErrorSound() {
+            initAudio();
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(100, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+    </script>
+
+    <!-- CORE BUSINESS LOGIC -->
+    <script>
+        // Update device system time
+        function updateSystemTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
+            document.getElementById('statusBarTime').innerText = timeString;
+        }
+        setInterval(updateSystemTime, 1000);
+        updateSystemTime();
+
+        // Local State
+        let generatedEmailsList = [];
+        let activeCreatedEmail = "";
+        let activeCreatedPassword = "";
+        let isPasswordRevealed = false;
+
+        // Custom list of futuristic keywords for generator
+        const coolPrefixes = [
+            'cyber', 'neon', 'phantom', 'shogun', 'nexus', 'shadow', 'quantum', 'titan', 'valkyrie', 
+            'apex', 'void', 'starlight', 'hyperion', 'spectral', 'aurora', 'eclipse', 'giga', 'omega',
+            'zenith', 'matrix', 'stellar', 'cosmic', 'draco', 'nebula', 'protocol', 'cryptic', 'sonic'
+        ];
+        
+        const coolSuffixes = [
+            'warrior', 'ghost', 'pulse', 'spark', 'runner', 'storm', 'core', 'beast', 'grid', 'driver',
+            'seeker', 'breaker', 'vector', 'forge', 'watcher', 'scout', 'saber', 'alpha', 'omega', 'reaper'
+        ];
+
+        // Load History from Local Storage (simulate in-memory state with visual persistence)
+        window.onload = function() {
+            const savedData = localStorage.getItem('auto_create_email_history');
+            if (savedData) {
+                generatedEmailsList = JSON.parse(savedData);
+                renderHistory();
+            }
+
+            // Animate Splash Screen Progress Bar
+            const bar = document.getElementById('splashProgress');
+            setTimeout(() => {
+                bar.style.width = '100%';
+            }, 100);
+
+            // Hide Splash Screen and transition smoothly
+            setTimeout(() => {
+                const splash = document.getElementById('splashScreen');
+                splash.classList.add('opacity-0', 'scale-105');
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                }, 1000);
+            }, 2600);
+        };
+
+        // Utility: Save to Local Storage
+        function saveHistoryToLocalStorage() {
+            localStorage.setItem('auto_create_email_history', JSON.stringify(generatedEmailsList));
+        }
+
+        // Random generator functions
+        function generateRandomUsername() {
+            playClickSound();
+            const randPrefix = coolPrefixes[Math.floor(Math.random() * coolPrefixes.length)];
+            const randSuffix = coolSuffixes[Math.floor(Math.random() * coolSuffixes.length)];
+            const randNum = Math.floor(100 + Math.random() * 899);
+            const generated = `${randPrefix}.${randSuffix}${randNum}`;
+            document.getElementById('inputUsername').value = generated;
+        }
+
+        function generateRandomPassword() {
+            playClickSound();
+            const charSet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&()_";
+            let pass = "";
+            const length = 12;
+            for (let i = 0; i < length; i++) {
+                pass += charSet.charAt(Math.floor(Math.random() * charSet.length));
+            }
+            document.getElementById('inputPassword').value = pass;
+        }
+
+        // Toast Notification Trigger
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById('toastNotification');
+            const toastMsg = document.getElementById('toastMessage');
+            
+            toastMsg.innerText = message;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 2500);
+        }
+
+        // Trigger Email Creation Flow
+        function triggerEmailCreation() {
+            playClickSound();
+            const usernameInput = document.getElementById('inputUsername').value.trim();
+            const passwordInput = document.getElementById('inputPassword').value.trim();
+
+            if (!usernameInput) {
+                playErrorSound();
+                showToast("Oops! Masukkan username Anda terlebih dahulu.");
+                return;
+            }
+            if (!passwordInput) {
+                playErrorSound();
+                showToast("Kata Sandi tidak boleh kosong.");
+                return;
+            }
+
+            // Hide previous success card if open
+            const successCard = document.getElementById('successCard');
+            successCard.classList.add('hidden', 'opacity-0', 'scale-95');
+
+            // Show and start console simulation animation
+            const consolePanel = document.getElementById('processingConsole');
+            const logsContainer = document.getElementById('terminalLogs');
+            consolePanel.classList.remove('hidden');
+            logsContainer.innerHTML = "";
+
+            const logs = [
+                "> Membuka socket koneksi SSL...",
+                "> Menghubungkan ke cluster mailserver premium...",
+                "> Enkripsi nama pengguna...",
+                `> Mendaftarkan inbox: ${usernameInput}@gmail.com`,
+                "> Memvalidasi parameter proteksi kata sandi...",
+                "> Alamat Kotak Masuk siap digunakan!"
+            ];
+
+            let logIndex = 0;
+            function runLogs() {
+                if (logIndex < logs.length) {
+                    const div = document.createElement('div');
+                    div.innerText = logs[logIndex];
+                    logsContainer.appendChild(div);
+                    logsContainer.scrollTop = logsContainer.scrollHeight;
+                    logIndex++;
+                    setTimeout(runLogs, 350 + Math.random() * 200);
+                } else {
+                    // Complete Processing
+                    setTimeout(finishEmailCreation, 400);
+                }
+            }
+            runLogs();
+        }
+
+        // Finish Animation and Display Result Card
+        function finishEmailCreation() {
+            const usernameInput = document.getElementById('inputUsername').value.trim().toLowerCase();
+            const passwordInput = document.getElementById('inputPassword').value.trim();
+            
+            activeCreatedEmail = `${usernameInput}@gmail.com`;
+            activeCreatedPassword = passwordInput;
+            isPasswordRevealed = false;
+
+            // Hide processing terminal
+            document.getElementById('processingConsole').classList.add('hidden');
+
+            // Render Success Card
+            const successCard = document.getElementById('successCard');
+            successCard.classList.remove('hidden');
+            
+            // Trigger visual transitions
+            setTimeout(() => {
+                successCard.classList.remove('opacity-0', 'scale-95');
+                successCard.classList.add('opacity-100', 'scale-100');
+            }, 50);
+
+            // Set Output displays
+            document.getElementById('displayEmail').innerText = activeCreatedEmail;
+            updatePasswordDisplay();
+
+            // Store in list
+            const dateStr = new Date().toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            generatedEmailsList.unshift({
+                email: activeCreatedEmail,
+                password: activeCreatedPassword,
+                date: dateStr
+            });
+
+            saveHistoryToLocalStorage();
+            renderHistory();
+            
+            // Audio sound & particle boom
+            playSuccessSound();
+            showToast("Sukses! Email berhasil dibuat.");
+            startConfettiEffect();
+        }
+
+        // Hide/Show password character toggle
+        function togglePasswordVisibility() {
+            playClickSound();
+            isPasswordRevealed = !isPasswordRevealed;
+            updatePasswordDisplay();
+        }
+
+        function updatePasswordDisplay() {
+            const displayPass = document.getElementById('displayPassword');
+            const eyeText = document.getElementById('eyeText');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            if (isPasswordRevealed) {
+                displayPass.innerText = activeCreatedPassword;
+                eyeText.innerText = "Sembunyikan";
+                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/>`;
+            } else {
+                displayPass.innerText = "• • • • • • • • • • • •";
+                eyeText.innerText = "Intip Sandi";
+                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>`;
+            }
+        }
+
+        // Copy Email to clipboard (Compatible fallback with iframe restrictions)
+        function copyGeneratedEmail() {
+            playClickSound();
+            const copyText = `Email: ${activeCreatedEmail}\nPassword: ${activeCreatedPassword}`;
+            
+            // Fallback for secure frames/iframe executions
+            const el = document.createElement('textarea');
+            el.value = copyText;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            showToast("Salin Berhasil! Data siap dibagikan.");
+        }
+
+        // Copy individual history item
+        function copyHistoryItem(email, password) {
+            playClickSound();
+            const copyText = `Email: ${email}\nPassword: ${password}`;
+            
+            const el = document.createElement('textarea');
+            el.value = copyText;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            showToast("Email & password disalin ke clipboard!");
+        }
+
+        // Delete single item from history list
+        function deleteHistoryItem(index) {
+            playClickSound();
+            generatedEmailsList.splice(index, 1);
+            saveHistoryToLocalStorage();
+            renderHistory();
+            showToast("Item dihapus dari riwayat.");
+        }
+
+        // Clear all history list
+        function clearHistory() {
+            playClickSound();
+            if (generatedEmailsList.length === 0) return;
+            
+            generatedEmailsList = [];
+            saveHistoryToLocalStorage();
+            renderHistory();
+            showToast("Seluruh riwayat dibersihkan.");
+        }
+
+        // Render History Items to UI
+        function renderHistory() {
+            const listEl = document.getElementById('historyList');
+            const placeholderEl = document.getElementById('historyPlaceholder');
+
+            if (generatedEmailsList.length === 0) {
+                listEl.classList.add('hidden');
+                placeholderEl.classList.remove('hidden');
+                return;
+            }
+
+            placeholderEl.classList.add('hidden');
+            listEl.classList.remove('hidden');
+            listEl.innerHTML = "";
+
+            generatedEmailsList.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "flex items-center justify-between p-3 rounded-2xl glass-panel hover:bg-white/[0.03] transition-all border border-white/5 relative group";
+                itemDiv.innerHTML = `
+                    <div class="flex-1 min-w-0 pr-3">
+                        <span class="text-[9px] text-neonBlue font-mono-tech block">${item.date}</span>
+                        <h5 class="text-xs font-semibold text-white truncate">${item.email}</h5>
+                        <p class="text-[10px] text-indigo-300 font-mono-tech truncate">Sandi: ${item.password}</p>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <!-- Quick Copy -->
+                        <button onclick="copyHistoryItem('${item.email}', '${item.password}')" class="p-2 rounded-xl hover:bg-white/10 text-slate-400 hover:text-white transition-colors" title="Salin Data">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                        </button>
+                        <!-- Delete item -->
+                        <button onclick="deleteHistoryItem(${index})" class="p-2 rounded-xl hover:bg-rose-950/45 text-slate-500 hover:text-rose-400 transition-colors" title="Hapus">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </div>
+                `;
+                listEl.appendChild(itemDiv);
+            });
+        }
+
+        // CONFETTI BURST PARTICLE EFFECT SYSTEM
+        let canvas = document.getElementById("confettiCanvas");
+        let ctx = canvas.getContext("2d");
+        let particles = [];
+        let confettiAnimationId;
+
+        function startConfettiEffect() {
+            // Setup canvas bounds
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+            
+            particles = [];
+            cancelAnimationFrame(confettiAnimationId);
+
+            const colors = ["#00F0FF", "#AD00FF", "#10B981", "#F59E0B", "#F43F5E"];
+            for (let i = 0; i < 40; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2 + 20,
+                    radius: Math.random() * 4 + 2,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speedX: (Math.random() - 0.5) * 8,
+                    speedY: (Math.random() - 0.7) * 9 - 2,
+                    alpha: 1,
+                    decay: Math.random() * 0.015 + 0.015
+                });
+            }
+            animateConfetti();
+        }
+
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let active = false;
+
+            particles.forEach((p) => {
+                if (p.alpha > 0) {
+                    active = true;
+                    ctx.save();
+                    ctx.globalAlpha = p.alpha;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+
+                    // Update positions
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    p.speedY += 0.15; // Gravity
+                    p.alpha -= p.decay;
+                }
+            });
+
+            if (active) {
+                confettiAnimationId = requestAnimationFrame(animateConfetti);
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+    </script>
+</body>
+      </html>
